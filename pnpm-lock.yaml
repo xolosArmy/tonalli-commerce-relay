@@ -23,6 +23,9 @@ importers:
       '@xolosarmy/pricing':
         specifier: workspace:*
         version: link:../../packages/pricing
+      '@xolosarmy/reputation':
+        specifier: workspace:*
+        version: link:../../packages/reputation
       '@xolosarmy/tonalli-auth':
         specifier: workspace:*
         version: link:../../packages/tonalli-auth

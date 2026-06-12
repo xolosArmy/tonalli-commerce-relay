@@ -11,6 +11,7 @@
     "@xolosarmy/escrow-core": "workspace:*",
     "@xolosarmy/models": "workspace:*",
     "@xolosarmy/pricing": "workspace:*",
+    "@xolosarmy/reputation": "workspace:*",
     "@xolosarmy/tonalli-auth": "workspace:*",
     "next": "^15.0.0",
     "react": "^19.0.0",
