@@ -8,6 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@xolosarmy/models": "workspace:*",
+    "@xolosarmy/pricing": "workspace:*",
     "@xolosarmy/tonalli-auth": "workspace:*",
     "next": "^15.0.0",
     "react": "^19.0.0",

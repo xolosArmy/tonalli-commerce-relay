@@ -11,3 +11,23 @@ It uses:
 - XEC escrow as settlement guarantee
 
 > Where XEC is not accepted, Tonalli buys for you.
+
+## Development API
+
+### Create auth challenge
+
+POST `/api/auth/challenge`
+
+### Verify auth challenge
+
+POST `/api/auth/verify`
+
+### Create commerce quote
+
+POST `/api/quote`
+
+```sh
+curl -X POST http://localhost:3000/api/quote \
+  -H "Content-Type: application/json" \
+  -d '{"amount":100,"currency":"MXN","intermediaryFeePercent":5,"platformFeePercent":1,"networkFeeReserveXec":100}'
+```
