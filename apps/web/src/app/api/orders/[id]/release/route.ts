@@ -3,6 +3,12 @@ import type { EscrowParticipant, EscrowParticipants } from "@xolosarmy/escrow-co
 import { NextResponse } from "next/server";
 
 import { getOrderStore } from "@/server/orders/get-order-store";
+import { getReputationStore } from "@/server/reputation/get-reputation-store";
+import {
+  applyEligibleOrderCompleted,
+  applyOrderCompleted,
+  isOrderEligibleForReputation,
+} from "@xolosarmy/reputation";
 
 interface OrderReleaseRouteContext {
   params: Promise<{
@@ -180,6 +186,49 @@ export async function POST(request: Request, context: OrderReleaseRouteContext) 
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
+  if (updatedOrder.intermediaryUserId) {
+    try {
+      const repStore = await getReputationStore();
+      let profile = await repStore.getProfile(updatedOrder.intermediaryUserId);
+
+      if (profile) {
+        const occurredAt = new Date().toISOString();
+        
+        const completedResult = applyOrderCompleted(profile, {
+          type: "order_completed",
+          userId: profile.userId,
+          orderId: updatedOrder.id,
+          volumeXec: updatedOrder.quote.totalXec.amount,
+          volumeFiatMxn: updatedOrder.quote.totalFiat.amount,
+          occurredAt,
+        });
+        
+        await repStore.addEvent(completedResult.event);
+        profile = completedResult.profile;
+
+        const eligibility = isOrderEligibleForReputation(updatedOrder);
+        
+        if (eligibility.eligible) {
+          const eligibleResult = applyEligibleOrderCompleted(profile, {
+            type: "eligible_order_completed",
+            userId: profile.userId,
+            orderId: updatedOrder.id,
+            volumeXec: updatedOrder.quote.totalXec.amount,
+            volumeFiatMxn: updatedOrder.quote.totalFiat.amount,
+            occurredAt,
+          });
+          
+          await repStore.addEvent(eligibleResult.event);
+          profile = eligibleResult.profile;
+        }
+        
+        await repStore.saveProfile(profile);
+      }
+    } catch (error) {
+      // Allow order release to succeed even if reputation update fails
+    }
+  }
+
   return NextResponse.json({
     order: updatedOrder,
     escrowTransactionDraft: draft,
@@ -302,7 +351,10 @@ function validateParticipant(
     return { valid: false, reason: address.reason };
   }
 
-  const publicKey = validateOptionalString(participantBody.publicKey, `${fieldName}.publicKey`);
+  const publicKey = validateOptionalString(
+    participantBody.publicKey,
+    `${fieldName}.publicKey`,
+  );
 
   if (!publicKey.valid) {
     return { valid: false, reason: publicKey.reason };
@@ -321,7 +373,11 @@ function validateParticipant(
 function validateNetworkFeeReserveXec(
   value: unknown,
 ): { valid: true; value: number } | { valid: false; reason: string } {
-  if (!isObjectRecord(value) || typeof value.amount !== "number" || !Number.isFinite(value.amount)) {
+  if (
+    !isObjectRecord(value) ||
+    typeof value.amount !== "number" ||
+    !Number.isFinite(value.amount)
+  ) {
     return {
       valid: false,
       reason: "order.quote.networkFeeReserveXec.amount must be a finite number",
@@ -380,7 +436,10 @@ function validateOptionalNonNegativeNumber(
   }
 
   if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
-    return { valid: false, reason: `${fieldName} must be a number greater than or equal to 0` };
+    return {
+      valid: false,
+      reason: `${fieldName} must be a number greater than or equal to 0`,
+    };
   }
 
   return { valid: true, value };
