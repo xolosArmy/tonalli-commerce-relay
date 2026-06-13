@@ -4,7 +4,7 @@ import {
 } from "@xolosarmy/tonalli-auth";
 import { NextResponse } from "next/server";
 
-import { nonceStore } from "@/server/auth/nonce-store";
+import { getAuthChallengeStore } from "@/server/auth/auth-store";
 
 interface ChallengeRequestBody {
   address?: unknown;
@@ -40,7 +40,8 @@ export async function POST(request: Request) {
     expiresInMinutes: 10,
   });
 
-  await nonceStore.create(challenge);
+  const authChallengeStore = await getAuthChallengeStore();
+  await authChallengeStore.create(challenge);
 
   return NextResponse.json({
     challenge,

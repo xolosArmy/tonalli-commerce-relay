@@ -36,6 +36,16 @@ pnpm --filter @xolosarmy/db prisma migrate dev --name init_users_auth_challenges
 pnpm --filter @xolosarmy/db prisma studio
 ```
 
+## Auth development
+
+`TONALLI_AUTH_STORE=memory` is the default and uses the in-memory challenge store.
+
+`TONALLI_AUTH_STORE=prisma` uses PostgreSQL for auth challenges and requires:
+
+- `docker compose up -d`
+- `DATABASE_URL` configured
+- `prisma migrate dev` executed
+
 ## Happy path demo
 
 ```bash

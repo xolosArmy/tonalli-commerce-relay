@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@xolosarmy/db": "workspace:*",
     "@xolosarmy/escrow-core": "workspace:*",
     "@xolosarmy/models": "workspace:*",
     "@xolosarmy/pricing": "workspace:*",

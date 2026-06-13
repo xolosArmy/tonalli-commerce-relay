@@ -1,7 +1,7 @@
 import { verifyAuthSignature } from "@xolosarmy/tonalli-auth";
 import { NextResponse } from "next/server";
 
-import { nonceStore } from "@/server/auth/nonce-store";
+import { getAuthChallengeStore } from "@/server/auth/auth-store";
 import { verifyTonalliMessage } from "@/server/auth/verify-message";
 
 interface VerifyRequestBody {
@@ -31,7 +31,8 @@ export async function POST(request: Request) {
 
   const nonce = body.nonce.trim();
   const signature = body.signature.trim();
-  const challenge = await nonceStore.findByNonce(nonce);
+  const authChallengeStore = await getAuthChallengeStore();
+  const challenge = await authChallengeStore.findByNonce(nonce);
 
   if (challenge === null) {
     return NextResponse.json(
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
     return NextResponse.json(result, { status: 401 });
   }
 
-  await nonceStore.markUsed(nonce);
+  await authChallengeStore.markUsed(nonce);
 
   return NextResponse.json({
     valid: true,

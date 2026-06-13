@@ -48,5 +48,4 @@ export class InMemoryTonalliNonceStore implements TonalliNonceStore {
   }
 }
 
-// TODO: replace this temporary store with PostgreSQL persistence plus Redis TTL/cache.
 export const nonceStore = new InMemoryTonalliNonceStore();
