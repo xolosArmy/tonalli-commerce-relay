@@ -55,6 +55,8 @@ TONALLI_ORDER_STORE=prisma
 
 The Prisma order store requires `DATABASE_URL`, `docker compose`, and Prisma migrations.
 
+Evidence and dispute persistence schema exists; endpoints will be wired in a later step.
+
 ## Auth development
 
 `TONALLI_AUTH_STORE=memory` is the default and uses the in-memory challenge store.

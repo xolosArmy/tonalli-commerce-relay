@@ -31,7 +31,7 @@ Este documento define la arquitectura de persistencia para Tonalli Commerce Rela
 * **Propósito:** Registro central del flujo comercial. El schema Prisma ya existe, pero los endpoints del MVP siguen usando el store in-memory hasta que se habilite la persistencia.
 * **Columnas Prisma:** `id` (String, PK), `buyerUserId` (String), `intermediaryUserId` (String, Nullable), `arbitratorUserId` (String, Nullable), `moderatorUserId` (String, Nullable), `status` (String), `disputeStatus` (String), `product` (Json), `quote` (Json), `createdAt`, `updatedAt`.
 * **Índices:** `status`, `buyerUserId`, `intermediaryUserId`, `createdAt`.
-* **Relaciones:** One-to-one opcional con `EscrowRecord`; one-to-many con `OrderEvent`.
+* **Relaciones:** One-to-one opcional con `EscrowRecord`; one-to-many con `OrderEvent`; one-to-many con `OrderEvidence`; one-to-one opcional con `Dispute`.
 * **Notas:** `product` y `quote` conservan la forma del MVP mientras se prepara el adapter de persistencia.
 
 ### `escrow_records`
@@ -47,9 +47,10 @@ Este documento define la arquitectura de persistencia para Tonalli Commerce Rela
 * **Relaciones:** Many-to-one con `Order`.
 
 ### `order_evidence`
-* **Propósito:** Registro de evidencias logísticas aportadas por el intermediario.
-* **Columnas:** `id` (UUID, PK), `order_id` (UUID, FK), `submitted_by_user_id` (UUID, FK), `evidence_type` (String), `uri` (String, Nullable), `hash` (String, Nullable), `notes` (Text, Nullable), `external_order_id` (String, Nullable), `created_at`.
-* **Índices:** `order_id`.
+* **Propósito:** Registro de evidencias de compra, envío, entrega, conversación u otros respaldos off-chain asociados a una orden.
+* **Columnas Prisma:** `id` (String, PK, `uuid()`), `orderId` (String), `type` (String), `uri` (String, Nullable), `hash` (String, Nullable), `notes` (String, Nullable), `externalReference` (String, Nullable), `submittedByUserId` (String, Nullable), `submittedAt`, `createdAt`.
+* **Índices:** `orderId`, `type`, `submittedByUserId`, `submittedAt`, compuesto `[orderId, submittedAt]`.
+* **Relaciones:** Many-to-one con `Order`.
 * **Notas:** `uri` no debe exponer datos sensibles en texto plano si se planea hacer publico.
 
 ### `reputation_profiles`
@@ -64,13 +65,15 @@ Este documento define la arquitectura de persistencia para Tonalli Commerce Rela
 
 ### `disputes`
 * **Propósito:** Registro de desacuerdos comerciales y arbitraje.
-* **Columnas:** `id` (UUID, PK), `order_id` (UUID, FK, Unique), `status` (String), `opened_by_user_id` (UUID, FK), `resolved_by_user_id` (UUID, FK, Nullable), `resolution_route` (String, Nullable), `created_at`, `updated_at`.
-* **Índices:** `order_id`, `status`.
+* **Columnas Prisma:** `id` (String, PK, `uuid()`), `orderId` (String, Unique), `status` (String), `openedByUserId` (String), `reason` (String), `openedAt`, `resolvedByUserId` (String, Nullable), `resolution` (String, Nullable), `authority` (String, Nullable), `resolvedAt` (DateTime, Nullable), `createdAt`, `updatedAt`.
+* **Índices:** `status`, `openedByUserId`, `resolvedByUserId`, `openedAt`, `resolvedAt`.
+* **Relaciones:** One-to-one requerida con `Order`; one-to-many con `DisputeEvent`.
 
 ### `dispute_events`
 * **Propósito:** Historial de la resolución de la disputa.
-* **Columnas:** `id` (UUID, PK), `dispute_id` (UUID, FK), `actor_user_id` (UUID, FK), `event_type` (String), `payload` (JSONB), `created_at`.
-* **Índices:** `dispute_id`.
+* **Columnas Prisma:** `id` (String, PK, `uuid()`), `disputeId` (String), `type` (String), `actorUserId` (String, Nullable), `payload` (Json, Nullable), `createdAt`.
+* **Índices:** `disputeId`, `type`, `actorUserId`, `createdAt`, compuesto `[disputeId, createdAt]`.
+* **Relaciones:** Many-to-one con `Dispute`.
 
 ---
 

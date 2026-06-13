@@ -52,6 +52,8 @@ model Order {
   updatedAt          DateTime
   escrowRecord       EscrowRecord?
   events             OrderEvent[]
+  evidence           OrderEvidence[]
+  dispute            Dispute?
 
   @@index([status])
   @@index([buyerUserId])
@@ -90,5 +92,64 @@ model OrderEvent {
   @@index([type])
   @@index([createdAt])
   @@index([orderId, createdAt])
+}
+
+model OrderEvidence {
+  id                 String   @id @default(uuid())
+  orderId            String
+  type               String
+  uri                String?
+  hash               String?
+  notes              String?
+  externalReference  String?
+  submittedByUserId  String?
+  submittedAt        DateTime
+  createdAt          DateTime @default(now())
+  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([type])
+  @@index([submittedByUserId])
+  @@index([submittedAt])
+  @@index([orderId, submittedAt])
+}
+
+model Dispute {
+  id               String         @id @default(uuid())
+  orderId          String         @unique
+  status           String
+  openedByUserId   String
+  reason           String
+  openedAt         DateTime
+  resolvedByUserId String?
+  resolution       String?
+  authority        String?
+  resolvedAt       DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  events           DisputeEvent[]
+
+  @@index([status])
+  @@index([openedByUserId])
+  @@index([resolvedByUserId])
+  @@index([openedAt])
+  @@index([resolvedAt])
+}
+
+model DisputeEvent {
+  id          String   @id @default(uuid())
+  disputeId   String
+  type        String
+  actorUserId String?
+  payload     Json?
+  createdAt   DateTime @default(now())
+  dispute     Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId])
+  @@index([type])
+  @@index([actorUserId])
+  @@index([createdAt])
+  @@index([disputeId, createdAt])
 }
 
