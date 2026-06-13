@@ -55,7 +55,23 @@ TONALLI_ORDER_STORE=prisma
 
 The Prisma order store requires `DATABASE_URL`, `docker compose`, and Prisma migrations.
 
-Evidence and dispute persistence schema exists; endpoints will be wired in a later step.
+### Evidence and dispute stores
+
+Defaults:
+
+```bash
+TONALLI_EVIDENCE_STORE=memory
+TONALLI_DISPUTE_STORE=memory
+```
+
+PostgreSQL:
+
+```bash
+TONALLI_EVIDENCE_STORE=prisma
+TONALLI_DISPUTE_STORE=prisma
+```
+
+The Prisma evidence and dispute stores require `DATABASE_URL`, `docker compose`, and Prisma migrations. Endpoints will be wired in a later step.
 
 ## Auth development
 
