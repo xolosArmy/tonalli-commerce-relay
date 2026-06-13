@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  address   String   @unique
-  alias     String?  @unique
-  role      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String             @id @default(uuid())
+  address           String             @unique
+  alias             String?            @unique
+  role              String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  reputationProfile ReputationProfile?
 }
 
 model AuthChallenge {
@@ -173,6 +174,7 @@ model ReputationProfile {
   isFrozen                Boolean  @default(false) @map("is_frozen")
   createdAt               DateTime @default(now()) @map("created_at")
   updatedAt               DateTime @updatedAt @map("updated_at")
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([score])
   @@index([level])

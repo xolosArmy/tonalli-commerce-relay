@@ -26,6 +26,10 @@ if [[ "${TONALLI_EVIDENCE_STORE:-}" != "prisma" ]]; then
   echo "Warning: TONALLI_EVIDENCE_STORE is not prisma." >&2
 fi
 
+if [[ "${TONALLI_REPUTATION_STORE:-}" != "prisma" ]]; then
+  echo -e "${YELLOW}Warning: TONALLI_REPUTATION_STORE is not set to 'prisma'. It is currently '${TONALLI_REPUTATION_STORE:-memory}'.${NC}"
+fi
+
 if [[ "${TONALLI_DISPUTE_STORE:-}" != "prisma" ]]; then
   echo "Warning: TONALLI_DISPUTE_STORE is not prisma." >&2
 fi
@@ -46,6 +50,7 @@ run_flow() {
 
 run_flow "Prisma auth smoke test" "auth-prisma-smoke.sh"
 run_flow "Prisma orders smoke test" "orders-prisma-smoke.sh"
+run_flow "Prisma reputation smoke test" "reputation-prisma-smoke.sh"
 run_flow "Happy path with full Prisma mode" "happy-path.sh"
 run_flow "Refund path with full Prisma mode" "refund-path.sh"
 run_flow "Dispute path with full Prisma mode" "dispute-path.sh"

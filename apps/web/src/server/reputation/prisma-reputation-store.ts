@@ -1,6 +1,6 @@
 import { prisma } from "@xolosarmy/db";
 import type { ReputationLevel, ReputationProfile } from "@xolosarmy/models";
-import type { ReputationEvent, ReputationEventType } from "@xolosarmy/reputation";
+import type { ReputationEvent } from "@xolosarmy/reputation";
 import type { ReputationStore } from "./reputation-store";
 
 export class PrismaReputationStore implements ReputationStore {
@@ -34,42 +34,59 @@ export class PrismaReputationStore implements ReputationStore {
   }
 
   async saveProfile(profile: ReputationProfile): Promise<void> {
-    await prisma.reputationProfile.upsert({
-      where: { userId: profile.userId },
-      create: {
-        userId: profile.userId,
-        alias: profile.alias,
-        address: profile.address,
-        level: profile.level,
-        score: profile.score,
-        completedOrders: profile.completedOrders,
-        completedEligibleOrders: profile.completedEligibleOrders,
-        totalVolumeXec: profile.totalVolumeXec,
-        totalVolumeFiatMxn: profile.totalVolumeFiatMxn,
-        openDisputes: profile.openDisputes,
-        wonDisputes: profile.wonDisputes,
-        lostDisputes: profile.lostDisputes,
-        maxOrderFiatMxn: profile.limits.maxOrderFiatMxn,
-        maxDailyFiatMxn: profile.limits.maxDailyFiatMxn,
-        isFrozen: profile.isFrozen,
-      },
-      update: {
-        alias: profile.alias,
-        address: profile.address,
-        level: profile.level,
-        score: profile.score,
-        completedOrders: profile.completedOrders,
-        completedEligibleOrders: profile.completedEligibleOrders,
-        totalVolumeXec: profile.totalVolumeXec,
-        totalVolumeFiatMxn: profile.totalVolumeFiatMxn,
-        openDisputes: profile.openDisputes,
-        wonDisputes: profile.wonDisputes,
-        lostDisputes: profile.lostDisputes,
-        maxOrderFiatMxn: profile.limits.maxOrderFiatMxn,
-        maxDailyFiatMxn: profile.limits.maxDailyFiatMxn,
-        isFrozen: profile.isFrozen,
-        updatedAt: new Date(),
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.user.upsert({
+        where: { id: profile.userId },
+        create: {
+          id: profile.userId,
+          address: profile.address,
+          alias: profile.alias ?? null,
+          role: "intermediary",
+        },
+        update: {
+          address: profile.address,
+          alias: profile.alias ?? null,
+          role: "intermediary",
+        },
+      });
+
+      await tx.reputationProfile.upsert({
+        where: { userId: profile.userId },
+        create: {
+          userId: profile.userId,
+          alias: profile.alias ?? null,
+          address: profile.address,
+          level: profile.level,
+          score: profile.score,
+          completedOrders: profile.completedOrders,
+          completedEligibleOrders: profile.completedEligibleOrders,
+          totalVolumeXec: profile.totalVolumeXec,
+          totalVolumeFiatMxn: profile.totalVolumeFiatMxn,
+          openDisputes: profile.openDisputes,
+          wonDisputes: profile.wonDisputes,
+          lostDisputes: profile.lostDisputes,
+          maxOrderFiatMxn: profile.limits.maxOrderFiatMxn,
+          maxDailyFiatMxn: profile.limits.maxDailyFiatMxn,
+          isFrozen: profile.isFrozen,
+        },
+        update: {
+          alias: profile.alias ?? null,
+          address: profile.address,
+          level: profile.level,
+          score: profile.score,
+          completedOrders: profile.completedOrders,
+          completedEligibleOrders: profile.completedEligibleOrders,
+          totalVolumeXec: profile.totalVolumeXec,
+          totalVolumeFiatMxn: profile.totalVolumeFiatMxn,
+          openDisputes: profile.openDisputes,
+          wonDisputes: profile.wonDisputes,
+          lostDisputes: profile.lostDisputes,
+          maxOrderFiatMxn: profile.limits.maxOrderFiatMxn,
+          maxDailyFiatMxn: profile.limits.maxDailyFiatMxn,
+          isFrozen: profile.isFrozen,
+          updatedAt: new Date(),
+        },
+      });
     });
   }
 
