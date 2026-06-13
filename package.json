@@ -9,6 +9,9 @@
   ],
   "scripts": {
     "build": "pnpm -r build",
+    "db:generate": "pnpm --filter @xolosarmy/db prisma generate",
+    "db:migrate": "pnpm --filter @xolosarmy/db prisma migrate dev",
+    "db:studio": "pnpm --filter @xolosarmy/db prisma studio",
     "dev": "echo \"No dev server configured yet\"",
     "dev:web": "pnpm --filter @xolosarmy/web dev",
     "lint": "echo \"No lint configured yet\"",

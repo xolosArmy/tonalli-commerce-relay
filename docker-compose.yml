@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: tonalli-commerce-postgres
+    environment:
+      POSTGRES_DB: tonalli_commerce_relay
+      POSTGRES_USER: tonalli
+      POSTGRES_PASSWORD: tonalli_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

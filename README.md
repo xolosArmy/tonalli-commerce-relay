@@ -14,6 +14,28 @@ It uses:
 
 ## Development API
 
+## Database development
+
+```bash
+docker compose up -d
+```
+
+```bash
+export DATABASE_URL="postgresql://tonalli:tonalli_dev_password@localhost:5432/tonalli_commerce_relay?schema=public"
+```
+
+```bash
+pnpm --filter @xolosarmy/db prisma generate
+```
+
+```bash
+pnpm --filter @xolosarmy/db prisma migrate dev --name init_users_auth_challenges
+```
+
+```bash
+pnpm --filter @xolosarmy/db prisma studio
+```
+
 ## Happy path demo
 
 ```bash
