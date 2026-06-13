@@ -3,6 +3,7 @@ import { canUserAcceptOrder } from "@xolosarmy/reputation";
 import { NextResponse } from "next/server";
 
 import { getOrderStore } from "@/server/orders/get-order-store";
+import { getReputationStore } from "@/server/reputation/get-reputation-store";
 
 interface OrderAcceptRouteContext {
   params: Promise<{
@@ -77,11 +78,21 @@ export async function POST(request: Request, context: OrderAcceptRouteContext) {
     return invalidAcceptOrderRequestResponse("buyerUserId must not match intermediary.userId");
   }
 
+  // --- REPUTATION ENGINE INJECTION ---
+  const reputationStore = await getReputationStore();
+  let profile = await reputationStore.getProfile(acceptRequest.intermediary.userId);
+  
+  if (!profile) {
+    profile = acceptRequest.reputationProfile;
+    await reputationStore.saveProfile(profile);
+  }
+
   const decision = canUserAcceptOrder({
-    profile: acceptRequest.reputationProfile,
+    profile,
     order,
     currentDailyVolumeFiatMxn: acceptRequest.currentDailyVolumeFiatMxn,
   });
+  // -----------------------------------
 
   if (!decision.allowed) {
     return NextResponse.json(
