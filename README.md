@@ -153,6 +153,7 @@ pnpm --filter @xolosarmy/db prisma migrate dev
 TONALLI_ORDER_STORE=prisma \
 TONALLI_EVIDENCE_STORE=prisma \
 TONALLI_DISPUTE_STORE=prisma \
+TONALLI_REPUTATION_STORE=prisma \
 DATABASE_URL="$DATABASE_URL" \
 pnpm dev:web
 ```
@@ -165,6 +166,7 @@ DATABASE_URL="$DATABASE_URL" \
 TONALLI_ORDER_STORE=prisma \
 TONALLI_EVIDENCE_STORE=prisma \
 TONALLI_DISPUTE_STORE=prisma \
+TONALLI_REPUTATION_STORE=prisma \
 bash scripts/prisma-commerce-flows.sh
 ```
 
@@ -203,6 +205,7 @@ TONALLI_AUTH_DEV_BYPASS=true \
 TONALLI_ORDER_STORE=prisma \
 TONALLI_EVIDENCE_STORE=prisma \
 TONALLI_DISPUTE_STORE=prisma \
+TONALLI_REPUTATION_STORE=prisma \
 DATABASE_URL="$DATABASE_URL" \
 pnpm dev:web
 ```
@@ -219,6 +222,7 @@ TONALLI_AUTH_DEV_BYPASS=true \
 TONALLI_ORDER_STORE=prisma \
 TONALLI_EVIDENCE_STORE=prisma \
 TONALLI_DISPUTE_STORE=prisma \
+TONALLI_REPUTATION_STORE=prisma \
 bash scripts/prisma-full-stack-flows.sh
 ```
 
