@@ -153,3 +153,45 @@ model DisputeEvent {
   @@index([disputeId, createdAt])
 }
 
+
+model ReputationProfile {
+  id                      String   @id @default(uuid())
+  userId                  String   @unique @map("user_id")
+  alias                   String?  @unique
+  address                 String
+  level                   String
+  score                   Int
+  completedOrders         Int      @map("completed_orders")
+  completedEligibleOrders Int      @map("completed_eligible_orders")
+  totalVolumeXec          Decimal  @map("total_volume_xec")
+  totalVolumeFiatMxn      Decimal  @map("total_volume_fiat_mxn")
+  openDisputes            Int      @map("open_disputes")
+  wonDisputes             Int      @map("won_disputes")
+  lostDisputes            Int      @map("lost_disputes")
+  maxOrderFiatMxn         Decimal  @map("max_order_fiat_mxn")
+  maxDailyFiatMxn         Decimal  @map("max_daily_fiat_mxn")
+  isFrozen                Boolean  @default(false) @map("is_frozen")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@index([score])
+  @@index([level])
+  @@map("reputation_profiles")
+}
+
+model ReputationEvent {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  type          String
+  orderId       String?  @map("order_id")
+  volumeXec     Decimal? @map("volume_xec")
+  volumeFiatMxn Decimal? @map("volume_fiat_mxn")
+  reason        String?
+  occurredAt    DateTime @map("occurred_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([type])
+  @@index([occurredAt])
+  @@map("reputation_events")
+}

@@ -375,3 +375,5 @@ curl -X POST http://localhost:3000/api/orders/order-id/resolve-dispute \
 
 ## Documentation
 * [Database Schema Design](docs/DATABASE_SCHEMA.md)
+
+Reputation persistence schema models exist in Prisma; engine adapters will be wired in a subsequent step.

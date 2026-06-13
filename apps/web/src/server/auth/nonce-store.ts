@@ -48,4 +48,9 @@ export class InMemoryTonalliNonceStore implements TonalliNonceStore {
   }
 }
 
-export const nonceStore = new InMemoryTonalliNonceStore();
+const globalForNonceStore = globalThis as typeof globalThis & {
+  __tonalliNonceStore?: InMemoryTonalliNonceStore;
+};
+
+export const nonceStore =
+  globalForNonceStore.__tonalliNonceStore ??= new InMemoryTonalliNonceStore();
