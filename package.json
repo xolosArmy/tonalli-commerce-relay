@@ -8,6 +8,7 @@
     "packages/*"
   ],
   "scripts": {
+    "auth:fixture-message": "jiti scripts/create-tonalli-auth-fixture-message.ts",
     "build": "pnpm -r build",
     "db:generate": "pnpm --filter @xolosarmy/db prisma generate",
     "db:migrate": "pnpm --filter @xolosarmy/db prisma migrate dev",
@@ -19,6 +20,7 @@
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {
+    "jiti": "^2.7.0",
     "vitest": "^3.0.0"
   }
 }

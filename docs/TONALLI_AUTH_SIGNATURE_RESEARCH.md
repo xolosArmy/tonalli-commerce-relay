@@ -174,6 +174,56 @@ Si la fixture real de Tonalli Wallet no verifica con `ecash-lib.verifyMsg`, no s
 debe activar runtime real todavia. En ese caso hay que documentar la diferencia
 exacta: prefijo, hash, algoritmo, encoding o canonicalizacion.
 
+## Fixture message para Tonalli Wallet
+
+Para obtener una firma real sin tocar el runtime productivo, generar primero el
+challenge y el mensaje canonico con la herramienta de desarrollo:
+
+```sh
+pnpm auth:fixture-message -- ecash:qzdq0q65fwnt94rlcph5kllj0xcry6e0v58zrgp7a3
+```
+
+Con alias visible en el challenge:
+
+```sh
+pnpm auth:fixture-message -- ecash:qzdq0q65fwnt94rlcph5kllj0xcry6e0v58zrgp7a3 --alias xolo
+```
+
+El script imprime:
+
+- JSON del challenge `TonalliAuth-v1`.
+- El string exacto de `formatChallengeForSigning(challenge)` entre marcadores
+  `BEGIN/END`.
+- Instrucciones para firmar ese texto en Tonalli Wallet.
+- Una plantilla JSON con `address`, `message` y `signature`.
+
+El valor default de `issuedAt` es fijo y el `nonce` se deriva de `address`,
+`alias` e `issuedAt`, por lo que el mensaje es reproducible para una misma
+entrada. Si se necesita una fixture con valores especificos, usar:
+
+```sh
+pnpm auth:fixture-message -- ecash:qzdq0q65fwnt94rlcph5kllj0xcry6e0v58zrgp7a3 --nonce tonalli-auth-fixture-001 --issued-at 2026-06-13T00:00:00.000Z --expires-in-minutes 10
+```
+
+Para pegar la firma real:
+
+1. Copiar exactamente el texto entre `-----BEGIN TONALLI AUTH MESSAGE-----` y
+   `-----END TONALLI AUTH MESSAGE-----`, sin incluir los marcadores.
+2. Firmarlo con Tonalli Wallet usando la address indicada.
+3. Copiar la firma devuelta por Wallet.
+4. Reemplazar `PEGAR_FIRMA_REAL_AQUI` en la plantilla JSON impresa por el
+   script.
+
+La plantilla todavia no debe activar verificacion real por si sola. Para
+convertirla en fixture de test posterior:
+
+1. Guardar el JSON en un archivo de fixtures de test, por ejemplo dentro de
+   `apps/web/src/server/auth`.
+2. Agregar un test del wrapper real que lea `address`, `message` y `signature`.
+3. Verificar con `EcashMessageVerifier` o directamente con `ecash-lib.verifyMsg`
+   segun el nivel de cobertura requerido.
+4. Ejecutar `pnpm test` y `pnpm typecheck`.
+
 ## Plan de implementacion en 2 commits
 
 ### Commit 1: instalar dependencia y wrapper real
